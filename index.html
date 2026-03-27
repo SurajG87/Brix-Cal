@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
-  <title>Brix Calculator | Syrup Recipe Tool</title>
+  <title>Brix Cal | Syrup Calculator</title>
   <style>
     * {
       box-sizing: border-box;
@@ -23,33 +23,59 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 12px;
+      padding: 8px;
       font-family: -apple-system, 'SF Pro Text', 'Helvetica Neue', system-ui, 'Segoe UI', sans-serif;
     }
 
     .master-card {
-      max-width: 500px;
+      max-width: 600px;
       width: 100%;
       background: #ffffff;
       border-radius: 28px;
       box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.2);
       overflow: hidden;
-      transition: all 0.2s ease;
     }
 
-    /* Header - completely blank as requested */
-    .header-blank {
-      display: none;
+    /* Header with "Brix Cal 🐑" */
+    .app-header {
+      background: linear-gradient(115deg, #1c5d7a 0%, #134b63 100%);
+      padding: 18px 20px 16px;
+      color: white;
+    }
+
+    .app-header h1 {
+      margin: 0;
+      font-weight: 700;
+      font-size: 26px;
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .app-header h1 span {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 4px 12px;
+      border-radius: 40px;
+      font-size: 20px;
+      font-weight: 500;
     }
 
     .calculator-panel {
-      padding: 20px 18px 24px;
+      padding: 18px 16px 22px;
       background: #ffffff;
     }
 
-    /* Input field styling - optimized for touch */
+    /* Compact grid layout - all inputs side by side where possible */
+    .input-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    /* Full width items (target brix row uses flex with preset buttons) */
     .input-module {
-      margin-bottom: 16px;
       width: 100%;
     }
 
@@ -57,15 +83,16 @@
       display: block;
       font-weight: 600;
       color: #1a5c7a;
-      margin-bottom: 6px;
-      font-size: 13px;
+      margin-bottom: 5px;
+      font-size: 11px;
       letter-spacing: -0.2px;
+      text-transform: uppercase;
     }
 
     .input-module input {
       width: 100%;
-      padding: 14px 16px;
-      font-size: 17px;
+      padding: 12px 10px;
+      font-size: 16px;
       border: 1.5px solid #e0eef5;
       border-radius: 14px;
       background: #ffffff;
@@ -86,32 +113,37 @@
     .input-module input::placeholder {
       color: #b8cfdf;
       font-weight: 400;
-      font-size: 15px;
+      font-size: 13px;
     }
 
-    /* Target row with presets */
-    .target-bar {
-      background: #f4fafd;
-      padding: 16px;
-      border-radius: 20px;
-      margin-bottom: 16px;
-      border: 1px solid #e2eff7;
-    }
-
-    .preset-strip {
+    /* Target row with side-by-side layout */
+    .target-row {
       display: flex;
       gap: 12px;
-      justify-content: center;
-      margin-top: 12px;
+      align-items: flex-end;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .target-row .input-module {
+      flex: 2;
+      min-width: 0;
+    }
+
+    .preset-buttons {
+      display: flex;
+      gap: 8px;
+      flex: 1;
+      min-width: 140px;
     }
 
     .pill-btn {
-      background: #ffffff;
+      background: #f0f7fc;
       border: 1px solid #cde3ef;
-      padding: 10px 20px;
-      border-radius: 40px;
+      padding: 12px 10px;
+      border-radius: 14px;
       font-weight: 600;
-      font-size: 15px;
+      font-size: 13px;
       cursor: pointer;
       transition: all 0.2s;
       color: #1a5d79;
@@ -121,17 +153,21 @@
     }
 
     .pill-btn:active {
-      transform: scale(0.96);
+      transform: scale(0.97);
       background: #e6f2f9;
     }
 
-    /* Helper text */
+    /* Final syrup weight - also in grid with something? but it's standalone */
+    .full-width {
+      grid-column: span 2;
+    }
+
     .helper-note {
-      font-size: 12px;
+      font-size: 10px;
       color: #6f9abb;
-      margin-top: 6px;
+      margin-top: 4px;
       margin-left: 4px;
-      line-height: 1.4;
+      line-height: 1.3;
     }
 
     /* Main action button */
@@ -140,11 +176,11 @@
       color: white;
       border: none;
       width: 100%;
-      padding: 16px 20px;
-      font-size: 17px;
+      padding: 14px 18px;
+      font-size: 16px;
       font-weight: 600;
       border-radius: 44px;
-      margin: 16px 0 20px;
+      margin: 12px 0 18px;
       cursor: pointer;
       transition: all 0.2s;
       box-shadow: 0 4px 12px rgba(28, 95, 124, 0.25);
@@ -153,25 +189,22 @@
 
     .action-btn:active {
       transform: scale(0.98);
-      background: linear-gradient(95deg, #1f6888 0%, #15506b 100%);
     }
 
-    /* Results grid - optimized for mobile */
+    /* Results grid - compact */
     .results-grid {
       background: #fbfefe;
       border-radius: 20px;
       border: 1px solid #e6f0f8;
       overflow: hidden;
-      margin-top: 4px;
     }
 
     .metric-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 14px 16px;
+      padding: 11px 14px;
       border-bottom: 1px solid #eff5fa;
-      flex-wrap: wrap;
       gap: 8px;
     }
 
@@ -182,7 +215,7 @@
     .metric-label {
       font-weight: 600;
       color: #1b5c7c;
-      font-size: 14px;
+      font-size: 12.5px;
       letter-spacing: -0.2px;
       flex: 1;
     }
@@ -190,13 +223,13 @@
     .metric-value {
       font-family: 'SF Mono', 'SF Pro Text', monospace;
       font-weight: 600;
-      font-size: 15px;
+      font-size: 13px;
       background: #eef4f9;
-      padding: 6px 14px;
+      padding: 4px 12px;
       border-radius: 30px;
       color: #105a7a;
       text-align: right;
-      min-width: 85px;
+      min-width: 75px;
     }
 
     .metric-value.dim {
@@ -204,16 +237,16 @@
       color: #9bb9cf;
     }
 
-    /* Footer attribution */
+    /* Footer */
     .attribution-footer {
       background: #f9fdfe;
-      padding: 14px 18px;
+      padding: 12px 16px;
       text-align: center;
       border-top: 1px solid #e2edf5;
     }
 
     .ig-link {
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 500;
     }
     .ig-link a {
@@ -221,106 +254,108 @@
       text-decoration: none;
       font-weight: 600;
     }
-    .ig-link a:active {
-      opacity: 0.7;
-    }
 
-    /* iPhone-specific optimizations */
-    @media (max-width: 480px) {
+    /* Responsive: on smaller iPhones, adjust grid and spacing */
+    @media (max-width: 520px) {
       body {
-        padding: 8px;
-        align-items: flex-start;
-        min-height: auto;
+        padding: 6px;
       }
       
-      .master-card {
-        border-radius: 24px;
-        margin-top: 8px;
-        margin-bottom: 8px;
+      .app-header {
+        padding: 14px 16px 12px;
+      }
+      
+      .app-header h1 {
+        font-size: 22px;
+      }
+      
+      .app-header h1 span {
+        font-size: 18px;
+        padding: 3px 10px;
       }
       
       .calculator-panel {
-        padding: 16px;
+        padding: 14px 12px 18px;
+      }
+      
+      .input-grid {
+        gap: 10px;
+        margin-bottom: 10px;
       }
       
       .input-module input {
-        padding: 13px 14px;
-        font-size: 16px;
+        padding: 11px 8px;
+        font-size: 15px;
       }
       
       .input-module label {
-        font-size: 12px;
-        margin-bottom: 5px;
+        font-size: 10px;
+        margin-bottom: 4px;
+      }
+      
+      .target-row {
+        gap: 8px;
+        margin-bottom: 10px;
       }
       
       .pill-btn {
-        padding: 9px 14px;
-        font-size: 14px;
+        padding: 11px 8px;
+        font-size: 12px;
       }
       
       .action-btn {
-        padding: 14px 18px;
-        font-size: 16px;
-        margin: 12px 0 16px;
+        padding: 13px 16px;
+        font-size: 15px;
+        margin: 10px 0 16px;
       }
       
       .metric-row {
-        padding: 12px 14px;
+        padding: 9px 12px;
       }
       
       .metric-label {
-        font-size: 13px;
+        font-size: 11.5px;
       }
       
       .metric-value {
-        font-size: 14px;
-        padding: 4px 12px;
-        min-width: 75px;
-      }
-      
-      .helper-note {
-        font-size: 11px;
+        font-size: 12px;
+        padding: 3px 10px;
+        min-width: 68px;
       }
     }
 
-    /* For smaller iPhones (SE, 5.4" displays) */
+    /* For very small screens (iPhone SE 1st gen, 320px) */
     @media (max-width: 380px) {
-      .calculator-panel {
-        padding: 14px;
-      }
-      
-      .target-bar {
-        padding: 12px;
-      }
-      
-      .preset-strip {
+      .input-grid {
         gap: 8px;
       }
       
-      .pill-btn {
-        padding: 8px 12px;
-        font-size: 13px;
+      .input-module input {
+        padding: 10px 6px;
+        font-size: 14px;
       }
       
-      .metric-row {
+      .pill-btn {
+        padding: 10px 6px;
+        font-size: 11px;
+      }
+      
+      .target-row {
         flex-direction: column;
-        align-items: flex-start;
-        gap: 6px;
+        align-items: stretch;
+      }
+      
+      .preset-buttons {
+        width: 100%;
+      }
+      
+      .metric-label {
+        font-size: 11px;
       }
       
       .metric-value {
-        align-self: flex-start;
-      }
-    }
-
-    /* iPhone Notch / Dynamic Island safe areas */
-    @supports (padding: max(0px)) {
-      .calculator-panel {
-        padding-left: max(16px, env(safe-area-inset-left));
-        padding-right: max(16px, env(safe-area-inset-right));
-      }
-      .attribution-footer {
-        padding-bottom: max(14px, env(safe-area-inset-bottom));
+        font-size: 11px;
+        min-width: 60px;
       }
     }
 
@@ -331,13 +366,26 @@
       }
     }
 
-    /* Better touch feedback */
+    /* Safe area support */
+    @supports (padding: max(0px)) {
+      .calculator-panel {
+        padding-left: max(12px, env(safe-area-inset-left));
+        padding-right: max(12px, env(safe-area-inset-right));
+      }
+      .app-header {
+        padding-left: max(16px, env(safe-area-inset-left));
+        padding-right: max(16px, env(safe-area-inset-right));
+      }
+      .attribution-footer {
+        padding-bottom: max(12px, env(safe-area-inset-bottom));
+      }
+    }
+
     button, .pill-btn {
       cursor: pointer;
       touch-action: manipulation;
     }
 
-    /* Remove spinner buttons on number inputs for cleaner look */
     input[type=number] {
       -moz-appearance: textfield;
     }
@@ -349,38 +397,47 @@
 </head>
 <body>
 <div class="master-card">
-  <!-- Header is completely blank as requested -->
-  <div class="header-blank"></div>
+  <!-- Header with "Brix Cal 🐑" -->
+  <div class="app-header">
+    <h1>
+      Brix Cal
+      <span>🐑</span>
+    </h1>
+  </div>
   
   <div class="calculator-panel">
-    <!-- Juice & initial brix -->
-    <div class="input-module">
-      <label>🍇 Juice weight</label>
-      <input type="number" id="juiceMass" step="any" placeholder="grams (e.g., 1000)" autocomplete="off">
-    </div>
-    
-    <div class="input-module">
-      <label>📊 Initial Brix</label>
-      <input type="number" id="startBrix" step="any" placeholder="°Bx (e.g., 12.5)" autocomplete="off">
+    <!-- Compact grid: all input fields side by side in 2 columns -->
+    <div class="input-grid">
+      <!-- Juice weight -->
+      <div class="input-module">
+        <label>🍇 Juice weight</label>
+        <input type="number" id="juiceMass" step="any" placeholder="grams" autocomplete="off">
+      </div>
+      
+      <!-- Initial Brix -->
+      <div class="input-module">
+        <label>📊 Initial Brix</label>
+        <input type="number" id="startBrix" step="any" placeholder="°Bx" autocomplete="off">
+      </div>
     </div>
 
-    <!-- Target Brix area + presets -->
-    <div class="target-bar">
-      <div class="input-module" style="margin-bottom: 0;">
+    <!-- Target Brix row with preset buttons - side by side layout -->
+    <div class="target-row">
+      <div class="input-module">
         <label>🎯 Target Brix</label>
-        <input type="number" id="desiredBrix" step="any" placeholder="°Bx (e.g., 50 or 66)" autocomplete="off">
+        <input type="number" id="desiredBrix" step="any" placeholder="°Bx" autocomplete="off">
       </div>
-      <div class="preset-strip">
-        <button class="pill-btn" data-bx="50">🍬 1:1 (50 Bx)</button>
-        <button class="pill-btn" data-bx="66">🍯 2:1 (66 Bx)</button>
+      <div class="preset-buttons">
+        <button class="pill-btn" data-bx="50">🍬 1:1</button>
+        <button class="pill-btn" data-bx="66">🍯 2:1</button>
       </div>
     </div>
 
-    <!-- FINAL SYRUP WEIGHT (required for gum + acids) -->
-    <div class="input-module">
-      <label>⚖️ Final syrup weight <span style="color:#c9683a;">*required for gum & acids</span></label>
+    <!-- Final Syrup Weight - full width with helper -->
+    <div class="input-module" style="margin-bottom: 8px;">
+      <label>⚖️ Final syrup weight <span style="color:#c9683a; font-weight: normal;">*for acids & gum</span></label>
       <input type="number" id="finalSyrupWeight" step="any" placeholder="total syrup weight in grams">
-      <div class="helper-note">📌 Gum, citric & ascorbic acids appear only when final weight is entered</div>
+      <div class="helper-note">📌 Gum, citric & ascorbic appear when final weight is entered</div>
     </div>
 
     <button class="action-btn" id="computeBtn">✨ Calculate Recipe</button>
@@ -448,7 +505,7 @@
     const citricSpan = document.getElementById('citricResult');
     const ascorbicSpan = document.getElementById('ascorbicResult');
 
-    // Format grams for display (clean, no decimals if integer)
+    // Format grams for display
     function formatGrams(value) {
       if (value === null || value === undefined || isNaN(value)) return '— g';
       if (!isFinite(value)) return '∞ g';
@@ -461,7 +518,7 @@
       }
     }
 
-    // Sugar addition formula: target brix adjustment
+    // Sugar addition formula
     function computeSugarAddition(juiceW, initBx, targetBx) {
       if (juiceW <= 0 || initBx < 0 || targetBx <= 0 || targetBx >= 100) return NaN;
       const existingSugar = juiceW * (initBx / 100);
@@ -473,41 +530,40 @@
       return sugarToAdd < 0 ? 0 : sugarToAdd;
     }
 
-    // 1:1 simple syrup equivalent reference
+    // 1:1 simple syrup equivalent
     function getSimpleSyrupEquivalent(juiceW, existingSugar) {
       if (juiceW <= 0) return 0;
       let val = juiceW - (existingSugar * 2);
       return val < 0 ? 0 : val;
     }
 
-    // 2:1 rich syrup equivalent reference
+    // 2:1 rich syrup equivalent
     function getRichSyrupEquivalent(juiceW, existingSugar) {
       if (juiceW <= 0) return 0;
       let val = (juiceW * 2) - (existingSugar * 3);
       return val < 0 ? 0 : val;
     }
 
-    // Acacia gum: 0.1 × juice weight ÷ 2
+    // Acacia gum: 0.1 × juice ÷ 2
     function calcAcaciaGum(juiceW) {
       if (!juiceW || juiceW <= 0) return 0;
       return (0.1 * juiceW) / 2;
     }
 
-    // Citric acid = 0.003 × final syrup weight (0.3%)
+    // Citric acid = 0.3% of final
     function calcCitricAcid(finalW) {
       if (!finalW || finalW <= 0) return 0;
       return finalW * 0.003;
     }
 
-    // Ascorbic acid = 0.3% of final syrup weight
+    // Ascorbic acid = 0.3% of final
     function calcAscorbicAcid(finalW) {
       if (!finalW || finalW <= 0) return 0;
       return finalW * 0.003;
     }
 
-    // Master update function
+    // Master update
     function refreshCalculations() {
-      // Get raw values
       let juiceWeight = parseFloat(juiceInput.value);
       let initBrix = parseFloat(initBrixInput.value);
       let targetBrix = parseFloat(targetBrixInput.value);
@@ -534,7 +590,6 @@
         richRef = getRichSyrupEquivalent(juiceWeight, existingSugar);
       }
 
-      // Update sugar-related results
       if (validSugarFlow) {
         existingSpan.innerText = formatGrams(existingSugar);
         waterSpan.innerText = formatGrams(waterMass);
@@ -549,7 +604,7 @@
         richRefSpan.innerText = '— g';
       }
 
-      // Handle Gum, Citric, Ascorbic (require final syrup weight)
+      // Handle acids and gum
       const validFinal = !isNaN(finalSyrup) && finalSyrup > 0;
       let gumValue = 0;
       let citricValue = 0;
@@ -561,8 +616,6 @@
         
         if (validJuice && juiceWeight > 0) {
           gumValue = calcAcaciaGum(juiceWeight);
-        } else {
-          gumValue = 0;
         }
         
         gumSpan.innerText = formatGrams(gumValue);
@@ -582,16 +635,15 @@
         ascorbicSpan.classList.add('dim');
       }
       
-      // Additional polish: if final weight provided but juice missing for gum
       if (validFinal && (!validJuice || juiceWeight <= 0)) {
-        gumSpan.innerText = '0 g (need juice)';
+        gumSpan.innerText = '0 g';
         gumSpan.classList.add('dim');
       } else if (validFinal && validJuice && juiceWeight > 0) {
         gumSpan.classList.remove('dim');
       }
     }
 
-    // Preset buttons for target Brix
+    // Preset buttons
     function initPresets() {
       const presetBtns = document.querySelectorAll('.pill-btn');
       presetBtns.forEach(btn => {
@@ -601,7 +653,6 @@
           if (!isNaN(brixVal) && brixVal > 0) {
             targetBrixInput.value = brixVal;
             refreshCalculations();
-            // subtle haptic-like feedback via animation
             btn.style.transform = 'scale(0.96)';
             setTimeout(() => { btn.style.transform = ''; }, 120);
           }
@@ -609,7 +660,7 @@
       });
     }
 
-    // Real-time updates + compute button
+    // Event binding
     function bindEvents() {
       const allInputs = [juiceInput, initBrixInput, targetBrixInput, finalWeightInput];
       allInputs.forEach(input => {
@@ -625,7 +676,7 @@
       });
     }
 
-    // Initialize with empty fields
+    // Initialize empty
     function setEmptyDefaults() {
       juiceInput.value = '';
       initBrixInput.value = '';
@@ -633,35 +684,10 @@
       finalWeightInput.value = '';
       refreshCalculations();
     }
-
-    // Add iOS-friendly touch improvements
-    function addTouchOptimizations() {
-      // Ensure inputs don't zoom on focus (already handled by font-size)
-      const style = document.createElement('style');
-      style.textContent = `
-        .metric-value.dim {
-          opacity: 0.7;
-          background: #f0f5fa;
-          color: #89adc4;
-        }
-        button, .pill-btn {
-          transition: transform 0.08s ease;
-        }
-        .action-btn {
-          font-weight: 600;
-          letter-spacing: -0.2px;
-        }
-        .metric-value {
-          font-weight: 590;
-        }
-      `;
-      document.head.appendChild(style);
-    }
     
     initPresets();
     bindEvents();
     setEmptyDefaults();
-    addTouchOptimizations();
   })();
 </script>
 </body>
